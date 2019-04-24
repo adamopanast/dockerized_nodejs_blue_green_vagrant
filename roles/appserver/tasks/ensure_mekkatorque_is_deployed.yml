@@ -1,0 +1,73 @@
+---
+
+- name: ensure_code_directory_exists
+  become: yes
+  file:
+    path: "{{ deployment_path }}"
+    state: directory 
+    owner: root
+    group: root
+    mode: 0775
+
+- name: ensure_code_is_up_to_date
+  become: yes
+  git:
+    repo: 'https://github.com/adamopanast/mekkatorque'
+    dest: "{{ deployment_path }}"
+    force: yes
+
+- name: ensure_mekkatorque_Dockerfile_is_deployed
+  become: yes
+  template: src=mekkatorqueDockerfile.j2 dest="{{ deployment_path }}/Dockerfile"
+
+- name: Check_for_containers_that_actually_exist
+  become: yes
+  shell: 'docker ps -aq --filter "name=mekkatorque"'
+  register: found_containers  
+
+#
+# INCLUDE THIS INSTRUCTION TO PREVENT THE PRESENCE OF   
+# DEPRICATED VULNERABLE PACKAGE : event-stream@3.3.6
+#
+
+- name: ensure_package_lock_has_been_removed
+  become: yes
+  file:
+    state: absent
+    path: "{{ deployment_path }}/package-lock.json"
+
+- name: build docker image
+  become: yes
+  docker_image:
+    name: mekkatorque
+    path: "{{ deployment_path }}"
+    nocache: yes
+    state: present
+    force: true
+    tag: "{{ app_version }}"
+  register: image_build
+ # changed_when: image_id.stdout != image_build.image.Id
+
+# - name: create container
+#   become: yes
+#   docker_container:
+#     name: mekkatorque
+#     image: mekkatorque
+#     recreate: '{{ True if image_build.changed else omit }}'
+#     state: started
+#     restart: yes
+#     detach: yes
+#     ports:
+#       - "{{ mekkatorque_port }}:{{ mekkatorque_port }}"  
+
+- name: ensure_deployment_script_exists
+  become: yes
+  template:
+    src: deploy.sh.j2
+    dest: /tmp/deploy_mekkatorque.sh
+    mode: 0775
+
+- name: ensure_mekkatorque_is_easy_deployed
+  become: yes
+  shell: /tmp/deploy_mekkatorque.sh
+

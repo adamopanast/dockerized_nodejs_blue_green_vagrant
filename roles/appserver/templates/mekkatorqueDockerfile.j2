@@ -1,0 +1,8 @@
+FROM node:8
+WORKDIR /usr/src/app
+ENV REDIS_URL {{ redis_url }}
+COPY . .
+RUN npm i
+EXPOSE {{ mekkatorque_port }}
+CMD npm run server
+CMD npm run jobs

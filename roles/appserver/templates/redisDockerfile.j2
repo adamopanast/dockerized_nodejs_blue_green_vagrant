@@ -1,0 +1,5 @@
+FROM redis
+COPY redis.conf /etc/redis.conf
+VOLUME /docker/host/dir:/data
+EXPOSE {{ redis_port }}
+CMD ["redis-server"]

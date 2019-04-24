@@ -1,0 +1,7 @@
+---
+
+- import_tasks: ensure_python_is_deployed.yml
+- import_tasks: ensure_docker_is_deployed.yml
+- import_tasks: ensure_redis_is_deployed.yml
+- import_tasks: ensure_easy-deploy_is_deployed.yml
+- import_tasks: ensure_mekkatorque_is_deployed.yml

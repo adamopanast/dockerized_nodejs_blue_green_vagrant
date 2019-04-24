@@ -1,0 +1,14 @@
+---
+
+- name: main_playbook
+  hosts: app
+  vars:
+    deployment_path: "/usr/src/app"
+    redis_storage: "/docker/host/dir"
+    redis_port: 6379
+    redis_url: "127.0.0.1:6379"
+    mekkatorque_port: 3000
+    easy_deploy_path: "/opt/easy-deploy"
+    app_version: "v1.0"
+  roles: 
+    - appserver

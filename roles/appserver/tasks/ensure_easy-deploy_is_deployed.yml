@@ -1,0 +1,23 @@
+---
+
+- name: ensure_easy_deploy_folder_exists
+  become: yes
+  file:
+    path: "{{ easy_deploy_path }}"
+    state: directory 
+    owner: root
+    group: root
+    mode: 0775
+
+- name: ensure_easy_deploy_exists
+  become: yes
+  get_url:
+    url: https://github.com/lazamar/easy-deploy/releases/download/v0.1/easy-deploy
+    dest: "{{ easy_deploy_path }}"
+    mode: 777
+
+- name: ensure_easy_deploy_is_executable
+  become: yes
+  file: 
+    dest: "{{ easy_deploy_path }}/easy-deploy" 
+    mode: a+x
